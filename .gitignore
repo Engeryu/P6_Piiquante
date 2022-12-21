@@ -125,3 +125,21 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Images
+*.jpg
+*.jpeg
+*.png
+*.bmp
+*.gif
+*.ico
+*.svg
+*.tiff
+*.tif
+*.webp
+
+# Directory
+frontend/
+
+# Zip
+Web-Developer-P6-master.zip
