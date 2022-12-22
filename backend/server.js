@@ -45,8 +45,6 @@ server.on("error", errorHandler)
 server.on("listening", () => {
   console.log(
     "Listening on port " +
-    process.env.PORT +
-    "(FR)écoute sur le port " +
     process.env.PORT
   )
 })

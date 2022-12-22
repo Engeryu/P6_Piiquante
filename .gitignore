@@ -127,16 +127,7 @@ dist
 .pnp.*
 
 # Images
-*.jpg
-*.jpeg
-*.png
-*.bmp
-*.gif
-*.ico
-*.svg
-*.tiff
-*.tif
-*.webp
+images/*
 
 # Directory
 frontend/

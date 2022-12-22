@@ -3,7 +3,7 @@ const multer = require("multer")
 // on définit les images/formats reçu en appartenance de format (comme un dictionnaire)
 const MIME_TYPES = {
   "image/jpg": "jpg",
-  "image/jpeg": "jpg",
+  "image/jpeg": "jpeg",
   "image/png": "png",
   "image/bmp": "bmp",
   "image/gif": "gif",

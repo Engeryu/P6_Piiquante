@@ -1,28 +1,36 @@
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const User = require("../models/User")
+const validator = require("validator")
+const requirement = require("../models/Password")
 
 // LOGIQUE SIGNUP
 exports.signup = (req, res, next) => {
-  const passwordValidator = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/
-
-  if (passwordValidator.test(req.body.password)) {
-    bcrypt.hash(req.body.password, 10)
-      .then(hash => {
+  const valideEmail = validator.isEmail(req.body.email);
+  const validePassword = requirement.validate(req.body.password);
+  if (valideEmail === true && validePassword === true) {
+    bcrypt
+      .hash(req.body.password, 10)
+      .then((hash) => {
         const user = new User({
           email: req.body.email,
-          password: hash
-        })
-        user.save()
-          .then(() => res.status(201).json({ error: 'Utilisateur créé !' }))
-          .catch(() => res.status(400).json({ error: "L'adresse mail renseignée est déjà utilisée." }))
+          password: hash,
+        });
+        user
+          .save()
+          .then(() =>
+            res
+              .status(201)
+              .json({ message: "Utilisateur créé !" })
+          )
+          .catch((error) => res.status(400).json({ error }));
       })
-      .catch(error => res.status(500).json({ error }))
+      .catch((error) => res.status(500).json({ error }));
+  } else {
+    console.log("Email ou mot de passe non conforme");
+    return res.status(401).json({ error : 'Email ou mot de passe non conforme'})
   }
-  else {
-    res.status(400).json({ message: "Le mot de passe doit faire une taille de 8 caractères et doit obligatoirement contenir : 1 majuscule + 1 minuscule + 1 chiffre + 1 symbole" })
-  }
-}
+};    
 
 // LOGIQUE LOGIN
 exports.login = (req, res, next) => {

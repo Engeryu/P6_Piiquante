@@ -8,6 +8,9 @@ const saucesRoutes = require("./routes/sauce")
 const userRoutes = require("./routes/user")
 const path = require("path")
 
+app.use(helmet())
+app.use(sanitize())
+
 // CORS
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*")

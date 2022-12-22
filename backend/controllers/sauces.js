@@ -1,6 +1,6 @@
 const Sauce = require("../models/Sauce")
 const fs = require("fs")
-const { error } = require("console")
+const format = require("../middleware/multer-config")
 
 // LOGIQUE GETALLSAUCE
 exports.getAllSauce = (req, res, next) => {
@@ -30,16 +30,7 @@ exports.createSauce = (req, res, next) => {
   if (sauceObject.userId !== req.auth.userId) {
     return res.status(403).json("unauthorized request")
   } else if (
-    req.file.mimetype === "image/jpeg" ||
-    req.file.mimetype === "image/png" ||
-    req.file.mimetype === "image/jpg" ||
-    req.file.mimetype === "image/bmp" ||
-    req.file.mimetype === "image/gif" ||
-    req.file.mimetype === "image/ico" ||
-    req.file.mimetype === "image/svg" ||
-    req.file.mimetype === "image/tiff" ||
-    req.file.mimetype === "image/tif" ||
-    req.file.mimetype === "image/webp"
+    format
   ) {
     const sauce = new Sauce({
       ...sauceObject,
@@ -56,29 +47,11 @@ exports.createSauce = (req, res, next) => {
       .then(() =>
         res
           .status(201)
-          .json({ message: "POST recorded sauce (FR)sauce enregistrée !" })
+          .json({ message: "POST sauce enregistrée !" })
       )
       .catch((error) => res.status(400).json({ error }))
   } else {
-    const sauce = new Sauce({
-      ...sauceObject,
-      imageUrl: `${req.protocol}://${req.get(
-        "host"
-      )}/images/defaut/imagedefaut.png`,
-      ...initialisation,
-    })
-    if (sauce.heat < 0 || sauce.heat > 10) {
-      sauce.heat = 0
-      console.log("valeur heat invalide, heat initialisé")
-    }
-    sauce
-      .save()
-      .then(() =>
-        res
-          .status(201)
-          .json({ message: "POST recorded sauce (FR)sauce enregistrée !" })
-      )
-      .catch((error) => res.status(400).json({ error }))
+    return res.status(400).json({ error : 'Format d\'image incorrect'})
   }
 }
 
@@ -99,20 +72,11 @@ exports.modifySauce = (req, res, next) => {
         return res.status(403).json("unauthorized request")
       } else if (req.file) {
         if (
-          req.file.mimetype === "image/jpeg" ||
-          req.file.mimetype === "image/png" ||
-          req.file.mimetype === "image/jpg" ||
-          req.file.mimetype === "image/bmp" ||
-          req.file.mimetype === "image/gif" ||
-          req.file.mimetype === "image/ico" ||
-          req.file.mimetype === "image/svg" ||
-          req.file.mimetype === "image/tiff" ||
-          req.file.mimetype === "image/tif" ||
-          req.file.mimetype === "image/webp"
+          format
         ) {
           const filename = sauce.imageUrl.split("/images/")[1]
-          const testImage = 'defaut/imagedefaut.png'
-          if (testImage != filename) {
+          const newImage = ''
+          if (newImage != filename) {
             fs.unlink(`images/${filename}`, () => { })
           }
           const sauceObject = {
@@ -123,19 +87,7 @@ exports.modifySauce = (req, res, next) => {
           }
           sauceBot = sauceObject
         } else {
-          const filename = sauce.imageUrl.split("/images/")[1]
-          const testImage = 'defaut/imagedefaut.png'
-          if (testImage != filename) {
-            fs.unlink(`images/${filename}`, () => { })
-          }
-          const sauceObject = {
-            ...JSON.parse(req.body.sauce),
-            imageUrl: `${req.protocol}://${req.get(
-              "host"
-            )}/images/defaut/imagedefaut.png`,
-            ...immuable,
-          }
-          sauceBot = sauceObject
+          return res.status(400).json({ error : 'Format d\'image incorrect'})
         }
       } else {
         req.body.imageUrl = sauce.imageUrl
@@ -156,7 +108,7 @@ exports.modifySauce = (req, res, next) => {
         .then(() =>
           res
             .status(201)
-            .json({ message: "modified sauce (FR)Objet modifié !" })
+            .json({ message: "Objet modifié !" })
         )
         .catch((error) => res.status(400).json({ error }))
     })
@@ -173,7 +125,7 @@ exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
       const nomImage = sauce.imageUrl
-      const imDefaut = "http://localhost:3000/images/defaut/imagedefaut.png"
+      const imDefaut = ''
       if (sauce.userId !== req.auth.userId) {
         return res.status(403).json("unauthorized request")
       } else if (nomImage != imDefaut) {
@@ -184,7 +136,7 @@ exports.deleteSauce = (req, res, next) => {
             .then(() =>
               res
                 .status(200)
-                .json({ message: "sauce removed (FR) sauce supprimée !" })
+                .json({ message: "sauce supprimée !" })
             )
             .catch((error) => res.status(400).json({ error }))
         })
@@ -193,7 +145,7 @@ exports.deleteSauce = (req, res, next) => {
           .then(() =>
             res
               .status(200)
-              .json({ message: "sauce removed (FR) sauce supprimée !" })
+              .json({ message: "sauce supprimée !" })
           )
           .catch((error) => res.status(400).json({ error }))
       }
@@ -233,7 +185,7 @@ exports.likeSauce = (req, res, next) => {
         sauce.dislikes += 1
         sauce.usersDisliked.push(votant)
       } else {
-        console.log("tentavive de vote illégal")
+        console.log("tentavive de vote illégitime")
       }
       Sauce.updateOne(
         { _id: req.params.id },
@@ -244,7 +196,7 @@ exports.likeSauce = (req, res, next) => {
           usersDisliked: sauce.usersDisliked,
         }
       )
-        .then(() => res.status(201).json({ message: "Vous venez de voter" }))
+        .then(() => res.status(201).json({ message: "Un vote de votre part a déjà été effectué" }))
         .catch((error) => {
           if (error) {
             console.log(error)

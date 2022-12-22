@@ -13,9 +13,12 @@ Télécharger le code source backend puis accéder en son sein depuis le termina
 * "mongoose"
 * "mongoose-unique-validator"
 * "multer"
+* "nodemon"
 * "express-mongo-sanitize"
 * "express-rate-limit"
 * "helmet"
+* "password-validator"
+* "validator"
 
 3. Faire de même avec le dossier frontend
 4. Dans le fichier config il faut un fichier .env: (exemple avec le fichier .env.example)
